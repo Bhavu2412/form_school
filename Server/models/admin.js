@@ -10,10 +10,12 @@ const Admin = new Schema({
     type: String,
     require: true,
   },
-  form: {
-    type: Schema.Types.ObjectId,
-    ref: "form",
-  },
+  form: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "form",
+    },
+  ],
   user: [
     {
       type: Schema.Types.ObjectId,

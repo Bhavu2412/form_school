@@ -18,12 +18,16 @@ const Client = new Schema({
     type: String,
     require: true,
   },
-  form: {
-    type: Schema.Types.ObjectId,
-    ref: "form",
-    performance: {
-      type: Number,
+  forms: [
+    {
+      form: {
+        type: Schema.Types.ObjectId,
+        ref: "form",
+      },
+      performance: {
+        type: Number,
+      },
     },
-  },
+  ],
 });
 module.exports = mongoose.model("client", Client);

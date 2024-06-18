@@ -90,4 +90,28 @@ router.post("/clientlogin", (req, res, next) => {
         .json({ message: "Internal server error. Please try again." });
     });
 });
+router.delete("/removeclient", async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    const client = await Client.findById(id);
+    if (!client) {
+      return res.status(404).json({ message: "Client not found!" });
+    }
+    await User.updateMany({}, { $pull: { client: id } });
+    await Form.updateMany({}, { $pull: { client: id } });
+    const response = await Client.deleteOne({ _id: id });
+    res.status(200).json({
+      message: "Client deleted successfully",
+      response: response,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Internal server error. Please try again later",
+      error: err,
+    });
+  }
+});
+
 module.exports = router;

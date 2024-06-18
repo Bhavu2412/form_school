@@ -2,9 +2,58 @@ const express = require("express");
 const router = express.Router();
 const Admin = require("../models/admin");
 const User = require("../models/users");
+const Form = require("../models/form");
 router.get("/", (req, resp, next) => {
   resp.json({ message: "Admin Routes" });
 });
+function isEmail(input) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(input);
+}
+
+function isUsername(input) {
+  const usernameRegex = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/;
+  return usernameRegex.test(input) && !isEmail(input);
+}
+
+function checkInput(input) {
+  if (isEmail(input)) {
+    return "email";
+  } else if (isUsername(input)) {
+    return "username";
+  } else {
+    return "invalid";
+  }
+}
+
+router.post("/adminlogin", (req, res, next) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  const inputType = checkInput(username);
+
+  Admin.findOne({ [inputType]: username })
+    .then((admin) => {
+      if (!admin) {
+        return res.status(404).json({ message: "No Admin found!" });
+      }
+      return bcrypt.compare(password, admin.password).then((match) => {
+        if (!match) {
+          return res.status(401).json({ message: "Password does not match" });
+        }
+        res.status(200).json({
+          message: "Password matched successfully!",
+          admin: admin,
+        });
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      res
+        .status(500)
+        .json({ message: "Internal server error. Please try again." });
+    });
+});
+
 router.post("/finduser", (req, res, next) => {
   const name = req.body.username;
   User.find({ name: name })
@@ -14,54 +63,54 @@ router.post("/finduser", (req, res, next) => {
       }
       res.status(200).json({
         message: "User Found",
-        Name: user.name,
-        Email: user.email,
-        Username: user.username,
-        Profession: user.profession,
+        user: user,
       });
     })
     .catch((err) => {
       res
         .status(500)
-        .json({ message: "Internal server error please try again later!" });
+        .json({ message: "Internal server error. Please try again later!" });
     });
 });
-router.post("/deleteuser", (req, resp, next) => {
-  const Id = req.body.userId;
-  User.find(Id)
-    .then((user) => {
-      if (!user) {
-        resp.status(400).json({ message: "No user found to delete!" });
-      }
-      return User.deleteOne(Id);
-    })
-    .then((response) => {
-      resp.status(200).json({ message: "User Deleted", user: response });
-    })
-    .catch((err) => {
-      resp
-        .status(500)
-        .json({ message: "Internal server error please try again later!" });
+router.delete("/deleteuser", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ message: "No user found to delete!" });
+    }
+    await Admin.updateMany({}, { $pull: { user: userId } });
+    await User.deleteOne({ _id: userId });
+    await Form.deleteMany({ user: userId });
+    res.status(200).json({
+      message: "Deleted the user and related forms successfully!",
     });
+  } catch (err) {
+    console.error(err); // Log the error for debugging
+    res
+      .status(500)
+      .json({ message: "Internal server error. Please try again later!" });
+  }
 });
 
-router.post("/deleteform", (req, resp, next) => {
-  const Id = req.body.formId;
-  Form.find(Id)
-    .then((form) => {
-      if (!form) {
-        resp.status(400).json({ message: "No form found to delete!" });
-      }
-      return Form.deleteOne(Id);
-    })
-    .then((response) => {
-      resp.status(200).json({ message: "Form Deleted", form: response });
-    })
-    .catch((err) => {
-      resp
-        .status(500)
-        .json({ message: "Internal server error please try again later!" });
-    });
+router.delete("/deleteform", async (req, res) => {
+  const { Id } = req.body;
+  try {
+    const form = await Form.findById(Id);
+    if (!form) {
+      return res.status(404).json({ message: "Form not found!" });
+    }
+    await Form.deleteOne({ _id: Id });
+    await Admin.updateMany({}, { $pull: { forms: { form: Id } } });
+    await User.updateMany({}, { $pull: { forms: { form: Id } } });
+    await Client.updateMany({}, { $pull: { forms: { form: Id } } });
+    res.status(200).json({ message: "Form deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Internal server error. Please try again later" });
+  }
 });
 
 router.post("/findform", (req, res, next) => {

@@ -22,9 +22,17 @@ const User = new Schema({
     type: String,
     require: true,
   },
-  form: {
-    type: Schema.Types.ObjectId,
-    ref: "form",
-  },
+  form: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "form",
+    },
+  ],
+  client: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "client",
+    },
+  ],
 });
 module.exports = mongoose.model("user", User);
