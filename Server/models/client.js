@@ -4,19 +4,20 @@ const Schema = mongoose.Schema;
 const Client = new Schema({
   email: {
     type: String,
-    require: true,
+    required: true,
   },
   name: {
     type: String,
-    require: true,
+    required: true,
   },
   username: {
     type: String,
-    require: true,
+    required: true,
+    unique: true,
   },
   password: {
     type: String,
-    require: true,
+    required: true,
   },
   forms: [
     {
@@ -24,6 +25,11 @@ const Client = new Schema({
         type: Schema.Types.ObjectId,
         ref: "form",
       },
+      answers: [
+        {
+          type: String,
+        },
+      ],
       performance: {
         type: Number,
       },

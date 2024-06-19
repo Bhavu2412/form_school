@@ -3,6 +3,8 @@ const router = express.Router();
 const Admin = require("../models/admin");
 const User = require("../models/users");
 const Form = require("../models/form");
+const Client = require("../models/client");
+const bcrypt = require("bcrypt");
 router.get("/", (req, resp, next) => {
   resp.json({ message: "Admin Routes" });
 });
@@ -26,51 +28,50 @@ function checkInput(input) {
   }
 }
 
-router.post("/adminlogin", (req, res, next) => {
+router.post("/adminlogin", async (req, res, next) => {
   const username = req.body.username;
   const password = req.body.password;
   const inputType = checkInput(username);
-
-  Admin.findOne({ [inputType]: username })
-    .then((admin) => {
-      if (!admin) {
-        return res.status(404).json({ message: "No Admin found!" });
-      }
-      return bcrypt.compare(password, admin.password).then((match) => {
-        if (!match) {
-          return res.status(401).json({ message: "Password does not match" });
-        }
-        res.status(200).json({
-          message: "Password matched successfully!",
-          admin: admin,
-        });
-      });
-    })
-    .catch((err) => {
-      console.error(err);
-      res
-        .status(500)
-        .json({ message: "Internal server error. Please try again." });
+  try {
+    const admin = await Admin.findOne({ [inputType]: username });
+    if (!admin) {
+      return res.status(404).json({ message: "No Admin found!" });
+    }
+    const match = admin.password === password;
+    if (!match) {
+      return res.status(401).json({ message: "Password does not match" });
+    }
+    res.status(200).json({
+      message: "Password matched successfully!",
+      admin: admin,
     });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Internal server error. Please try again." });
+  }
 });
 
-router.post("/finduser", (req, res, next) => {
-  const name = req.body.username;
-  User.find({ name: name })
-    .then((user) => {
-      if (!user) {
-        res.status(400).json({ message: "User not found!" });
-      }
-      res.status(200).json({
-        message: "User Found",
-        user: user,
-      });
-    })
-    .catch((err) => {
-      res
-        .status(500)
-        .json({ message: "Internal server error. Please try again later!" });
+router.post("/finduser", async (req, res, next) => {
+  try {
+    const { Id } = req.body;
+    const user = await User.findById(Id);
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found!" });
+    }
+
+    res.status(200).json({
+      message: "User Found",
+      user: user,
     });
+  } catch (err) {
+    console.error(err);
+    return res
+      .status(500)
+      .json({ message: "Internal server error. Please try again later!" });
+  }
 });
 router.delete("/deleteuser", async (req, res) => {
   const userId = req.body.userId;
@@ -113,24 +114,26 @@ router.delete("/deleteform", async (req, res) => {
   }
 });
 
-router.post("/findform", (req, res, next) => {
-  const Id = req.body.formId;
-  Form.find(Id)
-    .then((form) => {
-      if (!form) {
-        res.status(400).json({ message: "Form not found!" });
-      }
-      res.status(200).json({
-        message: "Form Found",
-        User: form.user,
-        Code: form.code,
-        Client: form.client,
-      });
-    })
-    .catch((err) => {
-      res
-        .status(500)
-        .json({ message: "Internal server error please try again later!" });
+router.post("/findform", async (req, res, next) => {
+  try {
+    const formId = req.body.formId;
+    const form = await Form.findById(formId);
+
+    if (!form) {
+      return res.status(400).json({ message: "Form not found!" });
+    }
+
+    res.status(200).json({
+      message: "Form Found",
+      User: form.user,
+      Code: form.code,
+      Client: form.client,
     });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Internal server error. Please try again later!" });
+  }
 });
 module.exports = router;

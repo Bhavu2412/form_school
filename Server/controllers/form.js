@@ -4,14 +4,35 @@ const Admin = require("../models/admin");
 const User = require("../models/users");
 const Form = require("../models/form");
 const Client = require("../models/client");
-xrouter.post("/findform", (req, res, next) => {
-  const { id } = req.body;
-  Form.findById(id).then((form) => {
-    if (!form) {
-      res.status(404).json({ message: "Form not found!" });
+router.post("/findform", async (req, res, next) => {
+  const { userId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "No user found!" });
     }
-    res.status(200).json({ message: "Found form!", form: form });
-  });
+    const forms = user.form;
+    const formarray = [];
+    for (const frm of forms) {
+      const fm = await Form.findById(frm);
+      if (fm) {
+        formarray.push(fm);
+      }
+    }
+    if (formarray.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No form published by the user!" });
+    }
+    res
+      .status(200)
+      .json({ message: "Form are fetched correctly", form: formarray });
+  } catch (err) {
+    cosnole.log(err);
+    res
+      .status(500)
+      .json({ message: "Internal server error. Please try again later." });
+  }
 });
 router.post("/createform", (req, res, next) => {
   const { user, name, questions, description } = req.body;
@@ -21,6 +42,7 @@ router.post("/createform", (req, res, next) => {
     user: user,
     questions: questions,
     description: description,
+    code: code,
   });
   form.save();
   User.findById(user)
@@ -38,44 +60,46 @@ router.post("/createform", (req, res, next) => {
         .json({ message: "Internal server error. Please try again later." });
     });
 });
-router.delete("/deleteform", (req, res, next) => {
-  const { id } = req.body;
-  Form.find(id)
-    .then((form) => {
-      if (!form) {
-        res.status(404).json({ message: "Form not found!" });
-      }
-      return User.findById(form);
-    })
-    .then((user) => {
-      if (!user) {
-        res.status(404).json({ message: "User not found" });
-      }
-      user.form.filter((formId) => formId.toString() !== id);
-      user.save();
-      return Form.deleteOne(id);
-    })
-    .then((resp) => {
-      res
-        .status(200)
-        .json({
-          message: "Form Has been deleted successfully!",
-          response: resp,
-        });
-    })
-    .catch((err) => {
-      res
-        .status(200)
-        .json({ message: "Internal server error. Please try again later!" });
+router.delete("/deleteform", async (req, res, next) => {
+  const { id, userId } = req.body;
+  try {
+    const form = await Form.findById(id);
+    if (!form) {
+      return res.status(404).json({ message: "Form not found!" });
+    }
+    const user = await User.findById(form.user.toString());
+    if (user._id.toString() !== userId) {
+      return res
+        .status(404)
+        .json({ message: "Form can be deleted by only the one who created!" });
+    }
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.form = user.form.filter((formId) => formId.toString() !== id);
+    await user.save();
+    const response = await Form.deleteOne({ _id: id });
+    res.status(200).json({
+      message: "Form Has been deleted successfully!",
+      response: response,
     });
+  } catch (err) {
+    console.log(err);
+    res
+      .status(200)
+      .json({ message: "Internal server error. Please try again later!" });
+  }
 });
 router.put("/editform/:id", async (req, res, next) => {
   const { id } = req.params;
-  const { description, questions, name } = req.body;
+  const { description, questions, name, userId } = req.body;
   try {
     const form = await Form.findById(id);
     if (!form) {
       res.status(404).json({ message: "Form not found!" });
+    }
+    if (form.user.toString() !== userId) {
+      return res.status(404).json({ message: "You cannot edit the form" });
     }
     if (description) {
       form.description = description;
@@ -84,41 +108,60 @@ router.put("/editform/:id", async (req, res, next) => {
       form.name = name;
     }
     if (questions) {
-      questions.forEach((updatedQuestion) => {
-        const question = form.question.id(updatedQuestion._id);
-        if (question) {
-          if (updatedQuestion.options) {
-            question.options = updatedQuestion.options;
-          }
-          if (updatedQuestion.answer) {
-            question.answer = updatedQuestion.answer;
-          }
-        }
-      });
+      form.questions = questions;
     }
     await form.save();
     res.status(200).json({ message: "Form updated successfully!" });
   } catch (err) {
+    console.log(err);
     res
       .status(500)
       .json({ message: "Internal server error. Please try again later." });
   }
 });
 
-router.put("/addq", (req, res, next) => {
-  const { question, Id } = req.body;
-  Form.findById(Id)
-    .then((form) => {
-      if (!form) {
-        res.status(404).json({ message: "Form not found try again later!" });
-      }
-      form.questions.push(question);
-      form.save();
-      res.status(200).json({ message: "Question added successfully!" });
-    })
-    .catch((err) => {
-      res.status.json({
-        message: "Internal server error. Please try again later.!",
-      });
+router.put("/addq", async (req, res, next) => {
+  const { question, Id, userId } = req.body;
+  try {
+    const form = await Form.findById(Id);
+    if (!form) {
+      return res
+        .status(404)
+        .json({ message: "Form not found try again later!" });
+    }
+    if (form.user.toString() !== userId) {
+      return res.status(404).json({ message: "You cannot edit the form" });
+    }
+    form.questions.push(question);
+    await form.save();
+    res.status(200).json({ message: "Question added successfully!" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Internal server error. Please try again later.!",
     });
+  }
 });
+router.delete("/deleteq", async (req, res, next) => {
+  const { quest, Id, userId } = req.body;
+  try {
+    const form = await Form.findById(Id);
+    if (!form) {
+      return res
+        .status(404)
+        .json({ message: "Form not found try again later!" });
+    }
+    if (form.user.toString() !== userId) {
+      return res.status(404).json({ message: "You cannot edit the form" });
+    }
+    form.questions = form.questions.filter((que) => que.question != quest);
+    await form.save();
+    res.status(200).json({ message: "Question deleted successfully!" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Internal server error. Please try again later.!",
+    });
+  }
+});
+module.exports = router;
