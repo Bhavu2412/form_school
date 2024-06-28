@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "FormsPro",
+  "name": "A user-friendly, responsive website with a clean design for intuitive form creation.",
   "icons": [
     {
       "src": "favicon.ico",

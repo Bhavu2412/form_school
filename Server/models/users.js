@@ -22,6 +22,9 @@ const User = new Schema({
     type: String,
     require: true,
   },
+  image: {
+    type: String,
+  },
   form: [
     {
       type: Schema.Types.ObjectId,

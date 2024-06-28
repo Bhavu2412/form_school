@@ -19,6 +19,9 @@ const Client = new Schema({
     type: String,
     required: true,
   },
+  image:{
+    type:String
+  },
   forms: [
     {
       form: {

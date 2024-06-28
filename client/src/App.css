@@ -1,38 +1,159 @@
-.App {
+@import url("https://fonts.googleapis.com/css2?family=Anek+Gujarati:wdth,wght@100.5,100..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Gwendolyn&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap");
+.hover-underline-animation {
+  display: inline-block;
+  position: relative;
+  color: #e3c454;
+}
+.hover-underline-animation::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #e3c454;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.hover-underline-animation:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.btn {
+  /* line-height: 50px; */
+  height: 30px;
   text-align: center;
+  width: 100px;
+  cursor: pointer;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.btn-one {
+  transition: all 0.3s;
+  position: relative;
+}
+.btn-one span {
+  transition: all 0.3s;
+}
+.btn-one::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  transition: all 0.3s;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+  border-top-color: rgba(255, 255, 255, 0.5);
+  border-bottom-color: rgba(255, 255, 255, 0.5);
+  transform: scale(0.1, 1);
+}
+.btn-one:hover span {
+  letter-spacing: 2px;
+}
+.btn-one:hover::before {
+  opacity: 1;
+  transform: scale(1, 1);
+}
+.btn-one::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  transition: all 0.3s;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+.btn-one:hover::after {
+  opacity: 0;
+  transform: scale(0.1, 1);
+}
+.body_main {
+  font-family: "Anek Gujarati";
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.btn-join {
+  border-radius: 15px;
+  font-family: "Anek Gujarati", "sans-serif";
+  border: none;
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  padding: 5px;
+  width: 130px;
+  height: 50px;
+  transition: all 0.5s;
+  cursor: pointer;
+  box-shadow: 0 5px 10px -4px rgba(0, 0, 0, 0.7);
+}
+
+.btn-join {
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: 0.5s;
+}
+
+.btn-join:after {
+  content: "»";
+  position: absolute;
+  opacity: 0;
+  top: 7px;
+  right: -10px;
+  transition: 0.5s;
+  font-size: 24px;
+}
+
+.btn-join:hover {
+  padding-right: 24px;
+  padding-left: 8px;
+}
+
+.btn-join:hover:after {
+  opacity: 1;
+  right: 10px;
+}
+
+.trend-box {
+  .rs-panel-body {
+    text-align: right;
+    .value {
+      font-size: 36px;
+    }
   }
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.chart-img {
+  width: 100px;
+  position: absolute;
+  left: 26px;
+  top: 34px;
+  opacity: 0.5;
+}
+a {
+  color: black;
 }
 
-.App-link {
-  color: #61dafb;
+/* Link color when hovered */
+a:hover {
+  color: black;
+  text-decoration: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Link color when clicked (active) */
+a:active {
+  color: black;
 }

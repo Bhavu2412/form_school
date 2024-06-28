@@ -5,46 +5,91 @@ const User = require("../models/users");
 const Form = require("../models/form");
 const Client = require("../models/client");
 const bcrypt = require("bcrypt");
-
-router.post("/signup", async (req, res, next) => {
-  const { email, name, username, profession, password } = req.body;
+const multer = require("multer");
+const jwt = require("jsonwebtoken");
+const cloudinary = require("cloudinary").v2;
+const isAuth = require("../utils/isAuth");
+cloudinary.config({
+  cloud_name: "ddej2sdnm",
+  api_key: "922999157567341",
+  api_secret: "cRKqrFP_cM92NdZCQ3Lwtt05tLI",
+});
+async function uploadToCloudinary(filePath, tags) {
   try {
-    const user = await User.findOne({ username: username });
-    if (user) {
-      return res.status(400).json({
-        message:
-          "User found with the same username! please try again with diffrent username",
-        user: user,
-      });
+    const result = await cloudinary.uploader.upload(filePath, { tags });
+    return { url: result.secure_url, error: null };
+  } catch (error) {
+    return { url: null, error };
+  }
+}
+const upload = multer({ dest: "uploads/" });
+router.post("/signup", upload.single("image"), async (req, res) => {
+  const { email, name, username, profession, password } = req.body;
+  const image = req.file.path;
+  try {
+    if (!image) {
+      return res.status(400).json({ message: "Image not provided." });
     }
-    const usr = await User.findOne({ email: email });
+
+    const { url: imageUrl, error } = await uploadToCloudinary(
+      image,
+      "profile_users"
+    );
+
+    if (error) {
+      return res
+        .status(400)
+        .json({ message: "Image upload failed. Please try again." });
+    }
+
+    const usr = await User.findOne({ email });
     if (usr) {
       return res.status(400).json({
         message:
-          "User found with the same email! please try again with diffrent email",
-        user: usr,
+          "User found with the same email! Please try again with different email",
+      });
+    }
+    const ussr = await User.findOne({ username: username });
+    if (ussr) {
+      return res.status(400).json({
+        message:
+          "User found with the same username! Please try again with different username",
       });
     }
     const hashPass = await bcrypt.hash(password, 12);
     if (!hashPass) {
-      res.status(400).json({ message: "Hash Password not found!" });
+      return res.status(400).json({ message: "Hash Password not found!" });
     }
+
     const us = new User({
-      username: username,
+      username,
       password: hashPass,
-      name: name,
-      proffession: profession,
-      email: email,
+      name,
+      profession,
+      email,
+      image: imageUrl,
     });
+
     await us.save();
-    if (!Admin.user) {
-      Admin.user = []; // Initialize Admin.user as an empty array
+    const token = jwt.sign(
+      {
+        userId: us._id,
+      },
+      "bhavu2412",
+      { expiresIn: "1d" }
+    );
+    const admin = await Admin.findById("667b9384460c437e10660dab");
+    if (!admin.user) {
+      admin.user = [];
     }
-    console.log(us);
-    const admin = await Admin.findById("667117d9b51cf80656699086");
     admin.user.push(us._id);
     await admin.save();
-    res.status(200).json({ message: "User created successfully!" });
+    res.status(200).json({
+      message: "User created successfully!",
+      token: token,
+      imageUrl: imageUrl,
+      userRole: "user",
+    });
   } catch (err) {
     console.log(err);
     return res
@@ -52,42 +97,56 @@ router.post("/signup", async (req, res, next) => {
       .json({ message: "Internal server error. Please try again later" });
   }
 });
-
 router.post("/login", async (req, res, next) => {
-  const { identifier, password } = req.body;
+  const { username, password } = req.body;
   try {
-    const user = await User.findOne({ email: identifier });
+    const user = await User.findOne({ email: username });
     if (!user) {
       return res.status(400).json({
-        message: "No user found with the given username or email!",
+        message: "No user found!",
       });
     }
-    const match = bcrypt.compare(password, user.password);
+    const match = bcrypt.compare(user.password, password);
     if (!match) {
-      return res.status(400).json({ message: "Incorrect password!" });
+      return res.status(400).json({ message: "Password donot match!" });
     }
-    res.status(200).json({ message: "Login successful!", user: user });
+    const token = jwt.sign(
+      {
+        userId: user._id,
+      },
+      "bhavu2412",
+      { expiresIn: "1d" }
+    );
+    res.status(200).json({
+      message: "User login successful!",
+      user: user.name,
+      token: token,
+      userRole: "user",
+      ImageUrl: user.image,
+      email: user.email,
+    });
   } catch (err) {
+    console.log(err);
     res
       .status(500)
       .json({ message: "Internal server error. Please try again later" });
   }
 });
-router.delete("/removeuser", async (req, resp, next) => {
-  const Id = req.body.Id;
+router.delete("/remove", isAuth, async (req, resp, next) => {
+  const { userId } = req.user;
   try {
-    const user = await User.findById(Id);
+    const user = await User.findById(userId);
     if (!user) {
       return resp.status(400).json({ message: "No user found to delete!" });
     }
-    const adminWithUser = await Admin.findById("667117d9b51cf80656699086");
+    const adminWithUser = await Admin.findById("667b9384460c437e10660dab");
     if (adminWithUser) {
       adminWithUser.user = adminWithUser.user.filter(
-        (id) => id.toString() !== Id
+        (id) => id.toString() !== userId
       );
       await adminWithUser.save();
     }
-    const response = await User.findByIdAndDelete(Id);
+    const response = await User.findByIdAndDelete(userId);
     resp.status(200).json({ message: "User Deleted", user: response });
   } catch (err) {
     return resp
@@ -95,35 +154,65 @@ router.delete("/removeuser", async (req, resp, next) => {
       .json({ message: "Internal server error, please try again later!" });
   }
 });
-router.post("/analyse", async (req, res, next) => {
-  const { id } = req.body;
+router.post("/deleteform", isAuth, async (req, res, next) => {
+  const { userId } = req.user;
+  const formId = req.body.Id;
+
   try {
-    const form = await Form.findById(id);
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+    const userForms = user.form || [];
+    if (!userForms.includes(formId)) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized access to the form!" });
+    }
+    const form = await Form.findByIdAndDelete(formId);
     if (!form) {
-      return res.status(400).json({ message: "No form found!" });
+      return res.status(404).json({ message: "Form not found!" });
     }
-    const clientId = form.client;
-    let performance = [];
-    for (const clt of clientId) {
-      let client = await Client.findById(clt);
-      if (client) {
-        let per = client.forms.find((form) => form.form.toString() === id);
-        if (per) {
-          performance.push({
-            client: client.name,
-            performance: per.performance,
-          });
-        }
-      }
+    user.form = user.form.filter((id) => id.toString() !== formId);
+    await user.save();
+    await Client.updateMany(
+      { "forms.form": formId },
+      { $pull: { forms: { form: formId } } }
+    );
+
+    res.status(200).json({ message: "Form deleted successfully!" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "Internal server error, please try again later!",
+    });
+  }
+});
+
+router.post("/analyse", isAuth, async (req, res, next) => {
+  const { userId } = req.user;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
     }
-    return res.status(200).json({
-      message: "Form and clients found successful",
-      performance: performance,
+    const uniqueClientsCount = await Client.countDocuments();
+    const userClients = user.client || [];
+    const userForms = user.form || [];
+    const clients = await Client.find({ _id: { $in: userClients } });
+    const forms = await Form.find({ _id: { $in: userForms } });
+
+    res.status(200).json({
+      uniqueClientsCount: uniqueClientsCount,
+      clients: clients,
+      forms: forms,
     });
   } catch (err) {
+    console.error(err);
     return res
       .status(500)
       .json({ message: "Internal server error, please try again later!" });
   }
 });
+
 module.exports = router;

@@ -4,8 +4,10 @@ const Admin = require("../models/admin");
 const User = require("../models/users");
 const Form = require("../models/form");
 const Client = require("../models/client");
-router.post("/findform", async (req, res, next) => {
-  const { userId } = req.body;
+const nodemailer = require("nodemailer");
+const isAuth = require("../utils/isAuth");
+router.post("/find", isAuth, async (req, res, next) => {
+  const { userId } = req.user;
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -34,34 +36,51 @@ router.post("/findform", async (req, res, next) => {
       .json({ message: "Internal server error. Please try again later." });
   }
 });
-router.post("/createform", (req, res, next) => {
-  const { user, name, questions, description } = req.body;
+router.post("/create", isAuth, async (req, res, next) => {
+  const { name, questions, description } = req.body;
+  const { userId } = req.user;
   const code = Math.floor(Math.random() * 10000000) + 100000;
-  const form = new Form({
-    name: name,
-    user: user,
-    questions: questions,
-    description: description,
-    code: code,
-  });
-  form.save();
-  User.findById(user)
-    .then((user) => {
-      if (!user) {
-        res.status(404).json({ message: "No user found!" });
-      }
-      user.form.push(form._id);
-      user.save();
-      res.status(200).json({ message: "form created successfully" });
-    })
-    .catch((err) => {
-      res
-        .status(500)
-        .json({ message: "Internal server error. Please try again later." });
+
+  try {
+    const form = new Form({
+      name: name,
+      user: userId,
+      questions: questions,
+      description: description,
+      code: code,
     });
+
+    await form.save();
+
+    const user = await User.findById(userId);
+    const admin = await Admin.findById("667b9384460c437e10660dab");
+
+    if (!user) {
+      return res.status(404).json({ message: "No user found!" });
+    }
+    if (!admin) {
+      return res.status(404).json({ message: "No admin found!" });
+    }
+    user.form.push(form._id);
+    await user.save();
+
+    admin.form.push(form._id);
+    await admin.save();
+
+    res
+      .status(200)
+      .json({ message: "Form created successfully", code: form.code });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ message: "Internal server error. Please try again later." });
+  }
 });
-router.delete("/deleteform", async (req, res, next) => {
-  const { id, userId } = req.body;
+
+router.delete("/delete", isAuth, async (req, res, next) => {
+  const { id } = req.body;
+  const { userId } = req.user;
   try {
     const form = await Form.findById(id);
     if (!form) {
@@ -90,9 +109,10 @@ router.delete("/deleteform", async (req, res, next) => {
       .json({ message: "Internal server error. Please try again later!" });
   }
 });
-router.put("/editform/:id", async (req, res, next) => {
+router.put("/edit/:id", isAuth, async (req, res, next) => {
   const { id } = req.params;
-  const { description, questions, name, userId } = req.body;
+  const { description, questions, name } = req.body;
+  const { userId } = req.user;
   try {
     const form = await Form.findById(id);
     if (!form) {
@@ -120,8 +140,9 @@ router.put("/editform/:id", async (req, res, next) => {
   }
 });
 
-router.put("/addq", async (req, res, next) => {
-  const { question, Id, userId } = req.body;
+router.put("/addq", isAuth, async (req, res, next) => {
+  const { question, Id } = req.body;
+  const { userId } = req.user;
   try {
     const form = await Form.findById(Id);
     if (!form) {
@@ -142,8 +163,9 @@ router.put("/addq", async (req, res, next) => {
     });
   }
 });
-router.delete("/deleteq", async (req, res, next) => {
-  const { quest, Id, userId } = req.body;
+router.delete("/deleteq", isAuth, async (req, res, next) => {
+  const { quest, Id } = req.body;
+  const { userId } = req.user;
   try {
     const form = await Form.findById(Id);
     if (!form) {
@@ -164,4 +186,34 @@ router.delete("/deleteq", async (req, res, next) => {
     });
   }
 });
+const transporter = nodemailer.createTransport({
+  service: "Gmail", // You can use other services
+  auth: {
+    user: "nodetutcomplete@gmail.com", // Replace with your email
+    pass: "objltxzyqscrmwzp", // Replace with your email password
+  },
+});
+
+router.post("/api/contact", (req, res) => {
+  const { name, email, message } = req.body;
+  const mailOptions = {
+    from: email,
+    to: "patelbhavya2412@gmail.com", // Replace with your receiving email
+    subject: `Contact Form Submission - ${name}`,
+    text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`,
+  };
+
+  // Send email
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("Error sending email:", error);
+      return res
+        .status(500)
+        .json({ status: "error", message: "Failed to send email" });
+    }
+
+    res.json({ status: "success", message: "Issue submitted successfully" });
+  });
+});
+
 module.exports = router;
