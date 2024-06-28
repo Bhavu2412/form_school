@@ -44,7 +44,7 @@ export default function Signup() {
       let response;
       if (role === "client") {
         response = await axios.post(
-          `http://localhost:8080/client/signup`,
+          `${process.env.REACT_APP_URL_HOST}/client/signup`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -52,7 +52,7 @@ export default function Signup() {
         );
       } else if (role === "user") {
         response = await axios.post(
-          `http://localhost:8080/user/signup`,
+          `${process.env.REACT_APP_URL_HOST}/user/signup`,
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },

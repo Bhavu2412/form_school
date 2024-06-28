@@ -7,7 +7,9 @@ export default function Profile() {
   async function handleDelete() {
     try {
       const response = await axios.delete(
-        `http://localhost:8080/${localStorage.getItem("role")}/remove`
+        `${process.env.REACT_APP_URL_HOST}/${localStorage.getItem(
+          "role"
+        )}/remove`
       );
       alert(response.data.message);
     } catch (err) {

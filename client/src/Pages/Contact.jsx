@@ -1,4 +1,3 @@
-import image from "../images/Question.jpeg";
 import { Input, Dropdown } from "rsuite";
 import Lottie from "lottie-react";
 import { Button } from "rsuite";
@@ -20,10 +19,13 @@ export default function Contact() {
     formData.append("email", data.email);
     formData.append("message", data.message);
     try {
-      const response = await fetch("http://localhost:8080/form/api/contact", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_HOST}/form/api/contact`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       const result = await response.json();
       if (result.status === "success") {
         alert(result.message);

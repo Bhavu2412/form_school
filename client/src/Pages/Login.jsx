@@ -28,11 +28,20 @@ export default function Login() {
     try {
       let response;
       if (role === "client") {
-        response = await axios.post(`http://localhost:8080/client/login`, data);
+        response = await axios.post(
+          `${process.env.REACT_APP_URL_HOST}/client/login`,
+          data
+        );
       } else if (role === "user") {
-        response = await axios.post(`http://localhost:8080/user/login`, data);
+        response = await axios.post(
+          `${process.env.REACT_APP_URL_HOST}/user/login`,
+          data
+        );
       } else if (role === "admin") {
-        response = await axios.post(`http://localhost:8080/admin/login`, data);
+        response = await axios.post(
+          `${process.env.REACT_APP_URL_HOST}/admin/login`,
+          data
+        );
       } else {
         alert("Select your role");
         return;

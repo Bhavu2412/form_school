@@ -31,7 +31,7 @@ const DataTable = ({ data }) => {
     const { _id } = selectedUser;
     try {
       await axios.post(
-        "http://localhost:8080/admin/deleteuser",
+        `${process.env.REACT_APP_URL_HOST}/admin/deleteuser`,
         { userId: _id },
         {
           headers: {

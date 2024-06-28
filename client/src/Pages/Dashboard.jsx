@@ -22,7 +22,7 @@ const Dashboard = () => {
         let response;
         if (localStorage.getItem("role") === "admin") {
           response = await axios.post(
-            "http://localhost:8080/admin/analyse",
+            `${process.env.REACT_APP_URL_HOST}/admin/analyse`,
             {},
             {
               headers: {
@@ -33,7 +33,7 @@ const Dashboard = () => {
           setData(response.data);
         } else if (localStorage.getItem("role") === "user") {
           response = await axios.post(
-            "http://localhost:8080/user/analyse",
+            `${process.env.REACT_APP_URL_HOST}/user/analyse`,
             {},
             {
               headers: {
@@ -43,7 +43,7 @@ const Dashboard = () => {
           );
         } else if (localStorage.getItem("role") === "client") {
           response = await axios.post(
-            "http://localhost:8080/client/analyse",
+            `${process.env.REACT_APP_URL_HOST}/client/analyse`,
             {},
             {
               headers: {

@@ -107,7 +107,7 @@ export default function Form() {
   async function handleSubmit() {
     try {
       const response = await axios.post(
-        "http://localhost:8080/form/create",
+        `${process.env.REACT_APP_URL_HOST}/fowrm/create`,
         data,
         {
           headers: {

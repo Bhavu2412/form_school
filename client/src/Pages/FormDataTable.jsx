@@ -30,7 +30,9 @@ const FDataTable = ({ data }) => {
     const { _id } = selectedForm;
     try {
       await axios.post(
-        `http://localhost:8080/${localStorage.getItem("role")}/deleteform`,
+        `${process.env.REACT_APP_URL_HOST}/${localStorage.getItem(
+          "role"
+        )}/deleteform`,
         { Id: _id },
         {
           headers: {

@@ -23,7 +23,7 @@ export default function Form() {
     setDisplay(false);
     try {
       const response = await axios.post(
-        "http://localhost:8080/client/fetch",
+        `${process.env.REACT_APP_URL_HOST}/client/fetch`,
         {
           code: code,
         },
@@ -46,7 +46,7 @@ export default function Form() {
   async function handleFormSubmit() {
     try {
       const response = await axios.post(
-        "http://localhost:8080/client/fill",
+        `${process.env.REACT_APP_URL_HOST}/client/fill`,
         {
           code: code,
           answers: answers,
