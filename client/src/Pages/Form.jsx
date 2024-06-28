@@ -4,10 +4,15 @@ import { Modal } from "rsuite";
 import Lottie from "lottie-react";
 import animationData from "../assets/Animation - 1718780730340.json";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 export default function Form() {
+  const navigate = useNavigate();
   const [code, setCode] = useState(null);
   const [open, setOpen] = React.useState(false);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    navigate("/dashboard");
+  };
   const [display, setDisplay] = useState(true);
   const [data, setData] = useState(null);
   const [answers, setAnswers] = useState([]);
@@ -54,7 +59,8 @@ export default function Form() {
       );
       setOpen(true);
     } catch (err) {
-      alert("Error: " + err.response.data.message);
+      console.log(err);
+      // alert("Error: " + err.response.data.message);
     }
   }
   function handleRadioButton(index, value) {
@@ -146,6 +152,9 @@ export default function Form() {
         )
       )}
       <Modal open={open} onClose={handleClose}>
+        <Modal.Header>
+          <Modal.Title></Modal.Title>
+        </Modal.Header>
         <Modal.Body>
           <Lottie animationData={animationData} loop={false} className="h-56" />
         </Modal.Body>

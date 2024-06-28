@@ -7,8 +7,10 @@ import {
   ButtonToolbar,
   IconButton,
   Placeholder,
+  Input,
+  InputGroup,
 } from "rsuite";
-import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faTrashAlt, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 
@@ -18,7 +20,7 @@ const FDataTable = ({ data }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedForm, setSelectedForm] = useState({});
   const [forms, setForms] = useState([]);
-
+  const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
     setForms(data.forms);
   }, [data.forms]);
@@ -52,19 +54,32 @@ const FDataTable = ({ data }) => {
     setSelectedForm(null);
     setShowModal(false);
   };
-  useEffect(() => {
-    console.log(showModal, selectedForm, forms);
-  }, []);
+  // useEffect(() => {
+  //   console.log(showModal, selectedForm, forms);
+  // }, []);
+  const filteredForms = forms.filter((form) =>
+    form.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   return (
     <Panel className="card" header="Forms">
-      <Table height={300} data={forms} rowKey="_id">
+      <InputGroup inside style={{ marginBottom: 10, width: "30%" }}>
+        <Input
+          placeholder="Search by form name"
+          value={searchQuery}
+          onChange={setSearchQuery}
+        />
+        <InputGroup.Button>
+          <FontAwesomeIcon icon={faSearch} />
+        </InputGroup.Button>
+      </InputGroup>
+      <Table height={300} data={filteredForms} rowKey="_id">
         <Column flexGrow={1} minWidth={100}>
           <HeaderCell>Form</HeaderCell>
           <Cell dataKey="name" />
         </Column>
 
-        <Column width={130}>
-          <HeaderCell>User</HeaderCell>
+        <Column width={230}>
+          <HeaderCell>Owner</HeaderCell>
           <Cell>{(rowData) => <span>{rowData.user}</span>}</Cell>
         </Column>
 
@@ -73,20 +88,38 @@ const FDataTable = ({ data }) => {
           <Cell>{(rowData) => <span>{rowData.client.length}</span>}</Cell>
         </Column>
 
-        <Column width={100}>
-          <HeaderCell>Delete</HeaderCell>
-          <Cell>
-            {(rowData) => (
-              <IconButton
-                icon={<FontAwesomeIcon icon={faTrashAlt} />}
-                appearance="primary"
-                size="xs"
-                onClick={() => openDeleteModal(rowData)}
-                className="ml-2"
-              />
-            )}
-          </Cell>
-        </Column>
+        {localStorage.getItem("role") === "admin" && (
+          <Column width={100}>
+            <HeaderCell>Delete</HeaderCell>
+            <Cell>
+              {(rowData) => (
+                <IconButton
+                  icon={<FontAwesomeIcon icon={faTrashAlt} />}
+                  appearance="primary"
+                  size="xs"
+                  onClick={() => openDeleteModal(rowData)}
+                  className="ml-2"
+                />
+              )}
+            </Cell>
+          </Column>
+        )}
+        {localStorage.getItem("role") === "user" && (
+          <Column width={100}>
+            <HeaderCell>Delete</HeaderCell>
+            <Cell>
+              {(rowData) => (
+                <IconButton
+                  icon={<FontAwesomeIcon icon={faTrashAlt} />}
+                  appearance="primary"
+                  size="xs"
+                  onClick={() => openDeleteModal(rowData)}
+                  className="ml-2"
+                />
+              )}
+            </Cell>
+          </Column>
+        )}
       </Table>
 
       <Modal open={showModal} onHide={closeDeleteModal}>

@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
+require('dotenv').config();
 
 app.get("/", (req, res, next) => {
   res.status(200).json({ message: "Hi! there" });
@@ -19,7 +20,7 @@ app.use("/admin", adminController);
 app.use("/user", userController);
 app.use("/client", clientController);
 app.use("/form", formController);
-mongoose.connect("mongodb://localhost:27017/formData").then(() => {
+mongoose.connect(`${process.env.MONGO_URL}`).then(() => {
   console.log("Connected to database!👍");
 });
 app.listen(8080, () => {

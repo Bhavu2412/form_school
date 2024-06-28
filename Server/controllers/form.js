@@ -53,7 +53,7 @@ router.post("/create", isAuth, async (req, res, next) => {
     await form.save();
 
     const user = await User.findById(userId);
-    const admin = await Admin.findById("667b9384460c437e10660dab");
+    const admin = await Admin.findById("667e8d7917648902bcc169b0");
 
     if (!user) {
       return res.status(404).json({ message: "No user found!" });
@@ -72,7 +72,7 @@ router.post("/create", isAuth, async (req, res, next) => {
       .json({ message: "Form created successfully", code: form.code });
   } catch (err) {
     console.error(err);
-    res
+    return res
       .status(500)
       .json({ message: "Internal server error. Please try again later." });
   }
@@ -103,7 +103,7 @@ router.delete("/delete", isAuth, async (req, res, next) => {
       response: response,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res
       .status(200)
       .json({ message: "Internal server error. Please try again later!" });
@@ -133,7 +133,7 @@ router.put("/edit/:id", isAuth, async (req, res, next) => {
     await form.save();
     res.status(200).json({ message: "Form updated successfully!" });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res
       .status(500)
       .json({ message: "Internal server error. Please try again later." });
@@ -157,7 +157,7 @@ router.put("/addq", isAuth, async (req, res, next) => {
     await form.save();
     res.status(200).json({ message: "Question added successfully!" });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json({
       message: "Internal server error. Please try again later.!",
     });
@@ -180,7 +180,7 @@ router.delete("/deleteq", isAuth, async (req, res, next) => {
     await form.save();
     res.status(200).json({ message: "Question deleted successfully!" });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res.status(500).json({
       message: "Internal server error. Please try again later.!",
     });
@@ -194,7 +194,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-router.post("/api/contact", (req, res) => {
+router.post("/api/contact", isAuth, (req, res) => {
   const { name, email, message } = req.body;
   const mailOptions = {
     from: email,

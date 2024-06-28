@@ -8,8 +8,10 @@ import { faSlack } from "@fortawesome/free-brands-svg-icons";
 import { Input, InputGroup } from "rsuite";
 import EyeIcon from "@rsuite/icons/legacy/Eye";
 import EyeSlashIcon from "@rsuite/icons/legacy/EyeSlash";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 export default function Login() {
+  const navigate = useNavigate();
   const [data, setData] = useState({ username: "", password: "" });
   const [role, setRole] = useState("");
   const [visible, setVisible] = useState(false);
@@ -36,12 +38,14 @@ export default function Login() {
         return;
       }
       alert(response.data.message);
+      // console.log(response.data);
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("image", response.data.ImageUrl);
-      localStorage.setItem("role", response.data.userRole);
+      localStorage.setItem("role", role);
       localStorage.setItem("name", response.data.user);
       localStorage.setItem("email", response.data.email);
       setData({ username: "", password: "" });
+      navigate("/");
     } catch (err) {
       alert(err.response.data.message);
     }

@@ -19,8 +19,9 @@ const Dashboard = () => {
   useEffect(() => {
     async function fetchData() {
       try {
+        let response;
         if (localStorage.getItem("role") === "admin") {
-          const response = await axios.post(
+          response = await axios.post(
             "http://localhost:8080/admin/analyse",
             {},
             {
@@ -31,7 +32,7 @@ const Dashboard = () => {
           );
           setData(response.data);
         } else if (localStorage.getItem("role") === "user") {
-          const response = await axios.post(
+          response = await axios.post(
             "http://localhost:8080/user/analyse",
             {},
             {
@@ -40,9 +41,8 @@ const Dashboard = () => {
               },
             }
           );
-          setData(response.data);
         } else if (localStorage.getItem("role") === "client") {
-          const response = await axios.post(
+          response = await axios.post(
             "http://localhost:8080/client/analyse",
             {},
             {
@@ -51,11 +51,11 @@ const Dashboard = () => {
               },
             }
           );
-          console.log(response);
-          setData(response.data);
         }
+        setData(response.data);
       } catch (err) {
-        console.log("Error: " + err.response.data.message);
+        // console.log("Error: ", err);
+        alert("Error: " + err.response.data.message);
       }
     }
     fetchData();
@@ -79,20 +79,27 @@ const Dashboard = () => {
             {localStorage.getItem("role") === "client" && (
               <div className="value">0</div>
             )}
+            {localStorage.getItem("role") === null && (
+              <div className="value">0</div>
+            )}
           </Panel>
         </Col>
+
         <Col xs={7}>
           <Panel className="trend-box bg-green-100">
             <img className="chart-img" src={vv} />
             <div className="title">Client</div>
             {localStorage.getItem("role") === "admin" && (
-              <div className="value">{data.forms.length}</div>
+              <div className="value">{data.uniqueClientsCount}</div>
             )}
             {localStorage.getItem("role") === "user" && (
-              <div className="value">0</div>
+              <div className="value">{data.uniqueClientsCount}</div>
             )}
             {localStorage.getItem("role") === "client" && (
               <div className="value">1</div>
+            )}
+            {localStorage.getItem("role") === null && (
+              <div className="value">0</div>
             )}
           </Panel>
         </Col>
@@ -110,12 +117,22 @@ const Dashboard = () => {
           <FDataTable data={data} />
         </Col>
         <Col xs={8}>
-          <PieChart
-            title="Form v/s Client"
-            data={[data.forms.length, data.uniqueClientsCount]}
-            type="donut"
-            labels={["Form", "Client"]}
-          />
+          {localStorage.getItem("role") === "user" && (
+            <PieChart
+              title="Form v/s Client"
+              data={[data.forms.length, data.uniqueClientsCount]}
+              type="donut"
+              labels={["Form", "Client"]}
+            />
+          )}
+          {localStorage.getItem("role") === "admin" && (
+            <PieChart
+              title="Form v/s Client"
+              data={[data.forms.length, data.uniqueClientsCount]}
+              type="donut"
+              labels={["Form", "Client"]}
+            />
+          )}
         </Col>
       </Row>
       <Row gutter={30}>

@@ -1,7 +1,9 @@
 import { Divider, Button, Avatar } from "rsuite";
 
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 export default function Profile() {
+  const navigate = useNavigate();
   async function handleDelete() {
     try {
       const response = await axios.delete(
@@ -15,6 +17,7 @@ export default function Profile() {
 
   function handleLogout() {
     localStorage.clear();
+    navigate("/");
   }
   return (
     <>

@@ -7,7 +7,7 @@ module.exports = async (req, res, next) => {
     throw err;
   }
   const token = authHeader.split(" ")[1];
-  const decodedToken = jwt.verify(token, "bhavu2412");
+  const decodedToken = jwt.verify(token, `${process.env.SECRET_KEY}`);
   try {
     if (!decodedToken) {
       const err = new Error("No User found!!!");

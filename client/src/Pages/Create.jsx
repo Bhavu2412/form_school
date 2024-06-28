@@ -15,16 +15,20 @@ import {
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 
 export default function Form() {
+  const navigate = useNavigate();
   const [queCounter, setQueCounter] = useState(0);
   const [option, setOption] = useState("");
   const [options, setOptions] = useState([]);
   const [que, setQue] = useState("");
   const [open, setOpen] = React.useState(false);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    navigate("/");
+  };
   const [code, setCode] = useState(null);
   const [data, setData] = useState({
     name: "",
@@ -115,7 +119,7 @@ export default function Form() {
       setOpen(true);
       setData({ name: "", description: "", questions: [] });
     } catch (err) {
-      alert("Error: " + err.response.data.message);
+      console.log("Error: ", err);
     }
   }
 
@@ -129,10 +133,10 @@ export default function Form() {
     setOption("");
   }
 
-  useEffect(() => {
-    console.log(data);
-    console.log(options);
-  }, [data, options]);
+  // useEffect(() => {
+  //   console.log(data);
+  //   console.log(options);
+  // }, [data, options]);
 
   return (
     <>
@@ -293,7 +297,11 @@ export default function Form() {
           <Modal.Title className="font-Cursive text-4xl">FormPro</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Form code is {code}</p>
+          <p></p>
+          <p>
+            Form created successfully. Please use the code {code} to fill out
+            the form.
+          </p>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={handleClose} appearance="primary">

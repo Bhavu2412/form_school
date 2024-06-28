@@ -10,9 +10,9 @@ const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
 const isAuth = require("../utils/isAuth");
 cloudinary.config({
-  cloud_name: "ddej2sdnm",
-  api_key: "922999157567341",
-  api_secret: "cRKqrFP_cM92NdZCQ3Lwtt05tLI",
+  cloud_name: `${process.env.CLOUD_NAME}`,
+  api_key: `${process.env.CLOUD_API_KEY}`,
+  api_secret: `${process.env.CLOUD_API_SECRET_KEY}`,
 });
 async function uploadToCloudinary(filePath, tags) {
   try {
@@ -75,10 +75,10 @@ router.post("/signup", upload.single("image"), async (req, res) => {
       {
         userId: us._id,
       },
-      "bhavu2412",
+      `${process.env.SECRET_KEY}`,
       { expiresIn: "1d" }
     );
-    const admin = await Admin.findById("667b9384460c437e10660dab");
+    const admin = await Admin.findById("667e8d7917648902bcc169b0");
     if (!admin.user) {
       admin.user = [];
     }
@@ -91,7 +91,7 @@ router.post("/signup", upload.single("image"), async (req, res) => {
       userRole: "user",
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return res
       .status(400)
       .json({ message: "Internal server error. Please try again later" });
@@ -114,7 +114,7 @@ router.post("/login", async (req, res, next) => {
       {
         userId: user._id,
       },
-      "bhavu2412",
+      `${process.env.SECRET_KEY}`,
       { expiresIn: "1d" }
     );
     res.status(200).json({
@@ -126,7 +126,7 @@ router.post("/login", async (req, res, next) => {
       email: user.email,
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res
       .status(500)
       .json({ message: "Internal server error. Please try again later" });
@@ -139,7 +139,7 @@ router.delete("/remove", isAuth, async (req, resp, next) => {
     if (!user) {
       return resp.status(400).json({ message: "No user found to delete!" });
     }
-    const adminWithUser = await Admin.findById("667b9384460c437e10660dab");
+    const adminWithUser = await Admin.findById("667e8d7917648902bcc169b0");
     if (adminWithUser) {
       adminWithUser.user = adminWithUser.user.filter(
         (id) => id.toString() !== userId
@@ -196,15 +196,20 @@ router.post("/analyse", isAuth, async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: "User not found!" });
     }
-    const uniqueClientsCount = await Client.countDocuments();
     const userClients = user.client || [];
+    const uniqueClientsCount = await Client.distinct("_id", {
+      _id: { $in: userClients },
+    }).count();
     const userForms = user.form || [];
-    const clients = await Client.find({ _id: { $in: userClients } });
+    const uniqueClients = await Client.distinct("_id", {
+      _id: { $in: userClients },
+    });
+
     const forms = await Form.find({ _id: { $in: userForms } });
 
     res.status(200).json({
       uniqueClientsCount: uniqueClientsCount,
-      clients: clients,
+      clients: uniqueClients,
       forms: forms,
     });
   } catch (err) {

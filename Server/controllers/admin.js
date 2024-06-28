@@ -14,7 +14,6 @@ router.get("/", (req, resp, next) => {
 router.post("/login", async (req, res, next) => {
   const username = req.body.username;
   const password = req.body.password;
-  console.log(username, password);
   try {
     const admin = await Admin.findOne({ email: username });
     if (!admin) {
@@ -28,7 +27,7 @@ router.post("/login", async (req, res, next) => {
       {
         userId: admin._id,
       },
-      "bhavu2412",
+      `${process.env.SECRET_KEY}`,
       { expiresIn: "1d" }
     );
     res.status(200).json({
@@ -96,8 +95,8 @@ router.post("/deleteform", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Form not found!" });
     }
     await Form.deleteOne({ _id: Id });
-    await Admin.updateMany({}, { $pull: { forms: { form: Id } } });
-    await User.updateMany({}, { $pull: { forms: { form: Id } } });
+    await Admin.updateMany({}, { $pull: { form: Id } });
+    await User.updateMany({}, { $pull: { form: Id } });
     await Client.updateMany({}, { $pull: { forms: { form: Id } } });
     res.status(200).json({ message: "Form deleted successfully" });
   } catch (err) {

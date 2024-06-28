@@ -6,7 +6,6 @@ import { Input, InputGroup } from "rsuite";
 import EyeIcon from "@rsuite/icons/legacy/Eye";
 import EyeSlashIcon from "@rsuite/icons/legacy/EyeSlash";
 import { useNavigate } from "react-router-dom";
-
 import axios from "axios";
 export default function Signup() {
   const navigate = useNavigate();

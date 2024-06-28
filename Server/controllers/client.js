@@ -12,9 +12,9 @@ const isAuth = require("../utils/isAuth");
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
-  cloud_name: "ddej2sdnm",
-  api_key: "922999157567341",
-  api_secret: "cRKqrFP_cM92NdZCQ3Lwtt05tLI",
+  cloud_name: `${process.env.CLOUD_NAME}`,
+  api_key: `${process.env.CLOUD_API_KEY}`,
+  api_secret: `${process.env.CLOUD_API_SECRET_KEY}`,
 });
 async function uploadToCloudinary(filePath, tags) {
   try {
@@ -74,7 +74,7 @@ router.post("/signup", upload.single("image"), async (req, res) => {
       {
         userId: client._id,
       },
-      "bhavu2412",
+      `${process.env.SECRET_KEY}`,
       { expiresIn: "1d" }
     );
     res.status(200).json({
@@ -84,7 +84,7 @@ router.post("/signup", upload.single("image"), async (req, res) => {
       userRole: "client",
     });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     res
       .status(500)
       .json({ message: "Internal Server Error. Please try again later" });
@@ -109,7 +109,7 @@ router.post("/login", async (req, res, next) => {
       {
         userId: user._id,
       },
-      "bhavu2412",
+      `${process.env.SECRET_KEY}`,
       { expiresIn: "1d" }
     );
     res.status(200).json({
@@ -168,7 +168,7 @@ router.post("/fetch", isAuth, async (req, res, next) => {
     }
     res.status(200).json({ message: "Form found successfull", form: form });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return res
       .status(500)
       .json({ message: "Internal server error. Please try again later." });
@@ -188,17 +188,17 @@ router.post("/fill", isAuth, async (req, res, next) => {
     if (!client) {
       return res.status(404).json({ message: "Client not found" });
     }
-    let correctAnswers = 0;
-    form.questions.forEach((que, index) => {
-      if (que.answer === answers[index]) {
-        correctAnswers++;
-      }
-    });
-    const performance = (correctAnswers / form.questions.length) * 100;
+    // let correctAnswers = 0;
+    // form.questions.forEach((que, index) => {
+    //   if (que.answer === answers[index]) {
+    //     correctAnswers++;
+    //   }
+    // });
+    // const performance = (correctAnswers / form.questions.length) * 100;
+
     client.forms.push({
       form: form._id,
       answers: answers,
-      performance: performance,
     });
     await client.save();
     await Form.updateOne({ _id: form._id }, { $push: { client: client._id } });
@@ -207,7 +207,7 @@ router.post("/fill", isAuth, async (req, res, next) => {
       .status(200)
       .json({ message: "Form filled successfully!", performance: performance });
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return res
       .status(500)
       .json({ message: "Internal server error. Please try again later." });

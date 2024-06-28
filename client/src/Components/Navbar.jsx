@@ -52,7 +52,7 @@ export default function Navbar() {
               <Avatar circle size="sm" src={localStorage.getItem("image")} />
             </a>
           ) : (
-            <a>
+            <a href="/profile">
               <Avatar circle size="sm" />
             </a>
           )}
