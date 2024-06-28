@@ -164,7 +164,7 @@ router.post("/analyse", isAuth, async (req, res, next) => {
     console.error(err);
     return res
       .status(500)
-      .json({ message: "Internal server error, please try again later!" });
+      .json({ message: "Internal server error, please try again later." });
   }
 });
 
