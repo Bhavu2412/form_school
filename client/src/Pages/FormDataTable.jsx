@@ -6,7 +6,6 @@ import {
   Modal,
   ButtonToolbar,
   IconButton,
-  Placeholder,
   Input,
   InputGroup,
 } from "rsuite";
@@ -85,11 +84,18 @@ const FDataTable = ({ data }) => {
           <Cell>{(rowData) => <span>{rowData.user}</span>}</Cell>
         </Column>
 
-        <Column width={100}>
-          <HeaderCell>Client Count</HeaderCell>
-          <Cell>{(rowData) => <span>{rowData.client.length}</span>}</Cell>
-        </Column>
-
+        {localStorage.getItem("role") === "admin" && (
+          <Column width={100}>
+            <HeaderCell>Client Count</HeaderCell>
+            <Cell>{(rowData) => <span>{rowData.client.length}</span>}</Cell>
+          </Column>
+        )}
+        {localStorage.getItem("role") === "user" && (
+          <Column width={100}>
+            <HeaderCell>Client Count</HeaderCell>
+            <Cell>{(rowData) => <span>{rowData.client.length}</span>}</Cell>
+          </Column>
+        )}
         {localStorage.getItem("role") === "admin" && (
           <Column width={100}>
             <HeaderCell>Delete</HeaderCell>

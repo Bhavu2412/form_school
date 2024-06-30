@@ -4,7 +4,6 @@ const Admin = require("../models/admin");
 const User = require("../models/users");
 const Form = require("../models/form");
 const Client = require("../models/client");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const isAuth = require("../utils/isAuth");
 router.get("/", (req, resp, next) => {

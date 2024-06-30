@@ -1,67 +1,69 @@
 import { Input, Divider } from "rsuite";
-import React, { useState } from "react";
+import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSlack } from "@fortawesome/free-brands-svg-icons";
 export default function Footer() {
   function handleSubmitClick() {
     alert("You tried to contact us");
   }
-  const [viewport, setViewport] = useState({
-    latitude: 40.7128,
-    longitude: -74.006,
-    zoom: 12,
-    width: "100%",
-    height: "400px",
-  });
   return (
-    <div className="h-90 bg-blue-400 text-black ">
-      {/*gradient-to-b from-transparent to-blue-400 */}
-      <div className="flex flex-col ">
-        <div className="flex flex-row justify-between h-64  m-4 p-4">
-          <div className="flex flex-row  items-center space-x-20 justify-around w-1/4">
-            <div className="flex flex-col  items-center space-y-4 text-lg justify-between">
+    <div className="h-90 bg-blue-400 text-black">
+      <div className="flex flex-col">
+        <div className="flex flex-col md:flex-row justify-between h-auto md:h-64 m-4 p-4 space-y-8 md:space-y-0">
+          <div className="flex flex-row sm:flex-col md:flex-row items-center space-x-0 md:space-x-20 justify-around w-full md:w-1/4">
+            <div className="flex flex-col items-center space-y-4 text-lg justify-between w-full md:w-auto">
               <p className="font-sans text-lg font-bold text-blue-900 text-left">
                 About
               </p>
-              <ul className="space-y-4 flex font-serif flex-col ">
-                <li className="transition-colors cursor-pointer  hover-underline-animation">
+              <ul className="space-y-4 flex font-serif flex-col">
+                <li className="transition-colors cursor-pointer hover-underline-animation">
                   Careers
                 </li>
-                <li className="transition-colors cursor-pointer  hover-underline-animation">
+                <li className="transition-colors cursor-pointer hover-underline-animation">
                   News
                 </li>
-                <li className="transition-colors cursor-pointer  hover-underline-animation">
+                <li className="transition-colors cursor-pointer hover-underline-animation">
                   Review
                 </li>
-                <li className="transition-colors cursor-pointer  hover-underline-animation">
+                <li className="transition-colors cursor-pointer hover-underline-animation">
                   AboutUs
                 </li>
               </ul>
             </div>
-            <Divider orientation="vertical" />
-            <div className="flex flex-col font-serif text-lg space-y-4 items-center justify-between">
+            <Divider orientation="vertical" className="hidden md:block" />
+            <div className="flex flex-col font-serif text-lg space-y-4 items-center justify-between w-full md:w-auto">
               <p className="font-sans text-lg font-bold text-blue-900 text-left">
                 Consumer
               </p>
               <ul className="space-y-4 font-serif flex flex-col">
-                <li className="transition-colors cursor-pointer  hover-underline-animation">
+                <li className="transition-colors cursor-pointer hover-underline-animation">
                   Privacy
                 </li>
                 <li className="transition-colors cursor-pointer hover-underline-animation">
-                  Security
+                  <a href="/security">Security</a>
                 </li>
                 <li className="transition-colors cursor-pointer hover-underline-animation">
-                  Terms of Use
+                  <a
+                    href="/terms"
+                    className="text-customeGolden hover-text-customeGolden"
+                  >
+                    Terms of Use
+                  </a>
                 </li>
                 <li className="transition-colors cursor-pointer hover-underline-animation">
-                  JoinUs
+                  <a
+                    href="/"
+                    className="text-customeGolden hover-text-customeGolden"
+                  >
+                    JoinUs
+                  </a>
                 </li>
               </ul>
             </div>
           </div>
-          <div className="text-8xl font-Cursive flex flex-col items-center justify-center">
+          <div className="text-4xl md:text-8xl font-Cursive flex flex-col items-center justify-center w-full md:w-auto">
             <FontAwesomeIcon
-              className="h-32"
+              className="h-16 md:h-32"
               icon={faSlack}
               style={{ color: "#63E6BE" }}
             />
@@ -98,7 +100,7 @@ export default function Footer() {
               </svg>
             </div>
           </div>
-          <div className="flex flex-col justify-between space-y-4">
+          <div className="flex flex-col justify-between space-y-4 w-full md:w-auto">
             <div className="space-y-4">
               <p className="font-Link text-blue-900 text-4xl flex flex-col items-center">
                 Contact Us
@@ -110,26 +112,22 @@ export default function Footer() {
                 label="Email"
                 labelPlacement={"outside"}
               />
-              <button
-                onClick={() => handleSubmitClick()}
-                className="btn btn-one"
-              >
+              <button onClick={handleSubmitClick} className="btn btn-one">
                 Submit
               </button>
             </div>
             <Divider className="horizintal" />
             <div className="flex flex-col font-General">
-              <p>Company Name</p>
-              <p>123 Main Street, Suite 101</p>
-              <p>Cityville, State-Postal Code, Contry</p>
-
-              <p>Phone: +1 (555) 123-4567</p>
-              <p>Email: info@example.com</p>
+              <p>FormsPro</p>
+              <p>123 Main Street, California 3823</p>
+              <p>Inglewood, 90312, USA</p>
+              <p>Phone: +1 (555)-123-4567</p>
+              <p>Email: FormsPro@gmail.com</p>
             </div>
           </div>
         </div>
       </div>
-      <div className=" flex flex-row justify-center items-center h-16">
+      <div className="flex flex-row justify-center items-center h-16">
         <p>&copy; 2024 MyCompany. All rights reserved.</p>
       </div>
     </div>

@@ -7,6 +7,7 @@ import EyeIcon from "@rsuite/icons/legacy/Eye";
 import EyeSlashIcon from "@rsuite/icons/legacy/EyeSlash";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
 export default function Signup() {
   const navigate = useNavigate();
   const [role, setRole] = useState("");
@@ -19,18 +20,23 @@ export default function Signup() {
     profession: "",
   });
   const [visible, setVisible] = React.useState(false);
+
   const handleRoleChange = (value) => {
     setRole(value);
   };
+
   const handleVisibilityChange = () => {
     setVisible(!visible);
   };
+
   function handleFileChange(e) {
     setData({ ...data, imgFile: e.target.files[0] });
   }
+
   function handleChange(name, value) {
     setData({ ...data, [name]: value });
   }
+
   const handleSubmit = async () => {
     const formData = new FormData();
     formData.append("name", data.name);
@@ -84,24 +90,26 @@ export default function Signup() {
 
   return (
     <>
-      <div className="h-[100vh] w-screen flex items-center justify-center ">
-        <div className="bg-contactGradient h-[95%] w-[90%] space-y-2 rounded-3xl p-10 text-blue-100 flex flex-row justify-start items-center">
-          <div className="text-blue-100 flex flex-col justify-center items-start">
+      <div className="min-h-screen w-screen flex items-center justify-center p-4">
+        <div className="bg-contactGradient w-full max-w-5xl space-y-2 rounded-3xl p-6 md:p-10 text-blue-100 flex flex-col md:flex-row justify-center md:justify-start items-center md:items-start">
+          <div className="w-full md:w-1/2 text-blue-100 flex flex-col justify-center items-start space-y-4">
             <div className="space-y-2">
               <h3 className="font-others">Start for Free</h3>
               <div>
-                <h1 className="font-Cursive">Create new Account</h1>
-                <div className="flex flex-row space-x-2 font-General">
+                <h1 className="font-Cursive text-2xl md:text-4xl">
+                  Create new Account
+                </h1>
+                <div className="flex flex-row space-x-2 font-General text-sm md:text-base">
                   <h5>Already a member?</h5>
                   <h5>
-                    <a href="/login" className="color-blue-700">
+                    <a href="/login" className="text-blue-700">
                       Login
                     </a>
                   </h5>
                 </div>
               </div>
             </div>
-            <div className="mt-4 space-y-4 font-General">
+            <div className="mt-4 space-y-4 font-General w-full">
               <label>
                 <p>You are :</p>
                 <RadioGroup
@@ -131,7 +139,7 @@ export default function Signup() {
                   </RadioGroup>
                 </label>
               )}
-              <div className="w-[100%]">
+              <div className="w-full">
                 <label>
                   <p>Your Name</p>
                   <Input
@@ -142,8 +150,8 @@ export default function Signup() {
                   />
                 </label>
               </div>
-              <div className="flex flex-row space-x-4">
-                <label>
+              <div className="flex flex-col md:flex-row md:space-x-4 space-y-4 md:space-y-0 w-full">
+                <label className="w-full md:w-1/2">
                   <p>Your Email</p>
                   <Input
                     type="text"
@@ -152,7 +160,7 @@ export default function Signup() {
                     onChange={(value) => handleChange("email", value)}
                   />
                 </label>
-                <label>
+                <label className="w-full md:w-1/2">
                   <p>Your Username</p>
                   <Input
                     type="text"
@@ -162,7 +170,7 @@ export default function Signup() {
                   />
                 </label>
               </div>
-              <div className="w-[100%]">
+              <div className="w-full">
                 <label>
                   <p>Your Password</p>
                   <InputGroup inside>
@@ -177,19 +185,19 @@ export default function Signup() {
                   </InputGroup>
                 </label>
               </div>
-              <div>
+              <div className="w-full">
                 <label>
                   <p>Your photo</p>
                   <input
                     type="file"
-                    className="bg-white w-[100%] text-black p-1 rounded-md"
+                    className="bg-white w-full text-black p-1 rounded-md"
                     onChange={handleFileChange}
                   />
                 </label>
               </div>
-              <div>
+              <div className="w-full">
                 <button
-                  className="bg-blue-400 btn-join font-General"
+                  className="bg-blue-400 btn-join font-General w-full py-2 mt-4 rounded-lg"
                   onClick={handleSubmit}
                 >
                   Submit
@@ -197,11 +205,11 @@ export default function Signup() {
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-center">
+          <div className="w-full md:w-1/2 flex items-center justify-center mt-8 md:mt-0">
             <Lottie
               animationData={ani}
               loop={true}
-              className="w-[75%] flex items-center justify-center"
+              className="w-3/4 md:w-full"
             />
           </div>
         </div>

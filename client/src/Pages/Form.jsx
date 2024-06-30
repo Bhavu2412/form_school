@@ -72,7 +72,7 @@ export default function Form() {
     <>
       {display && (
         <div className="w-screen bg-gray-200 p-6 flex items-center justify-center">
-          <div className="bg-white w-[30%] p-3 rounded-lg">
+          <div className="bg-white w-[70%] sm:w-[40%] lg:w-[30%] p-3 rounded-lg">
             <p className="font-Link">To start test,</p>
             <label className="space-y-2">
               <p className="font-General">Enter code:</p>
@@ -107,7 +107,7 @@ export default function Form() {
                 <h4 className="font-Link">Description</h4>
               </>
             )}
-            <div className="m-5 p-5 flex space-y-10 flex-col bg-gray-200 w-[80%] rounded-3xl">
+            <div className="m-5 p-5 flex space-y-10 flex-col bg-gray-200 w-[110%] md:w-[80%] rounded-3xl">
               {data.questions.map((que, index) => (
                 <label key={index}>
                   <p>{que.question}</p>
@@ -123,8 +123,8 @@ export default function Form() {
                   </RadioGroup>
                 </label>
               ))}
-              <div className="flex flex-row items-center justify-between">
-                <div className="flex flex-col m-4">
+              <div className="flex flex-col md:flex-row items-center justify-between">
+                <div className="flex flex-col m-2 md:m-4">
                   <Checkbox>
                     By submitting this form, I agree to comply with all
                     specified terms and conditions.

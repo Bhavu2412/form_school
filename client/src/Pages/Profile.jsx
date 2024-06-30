@@ -24,7 +24,7 @@ export default function Profile() {
   return (
     <>
       <div>
-        <div className="bg-gray-200 flex flex-row items-center justify-center p-5 space-x-10">
+        <div className="bg-gray-200 flex flex-col sm:flex-row items-center justify-center p-5 space-y-5 sm:space-x-10">
           <div className="bg-white flex rounded-xl h-68">
             {localStorage.getItem("image") ? (
               <img
@@ -36,7 +36,7 @@ export default function Profile() {
               <Avatar size="xxl" />
             )}
           </div>
-          <div className="bg-white flex flex-col w-[25%] p-2 rounded-lg">
+          <div className="bg-white flex flex-col w-64 p-2 rounded-lg">
             <div className="flex flex-col items-start">
               <h2 className="font-Link">{localStorage.getItem("name")}</h2>
               <p className="font-hTags">Profession</p>

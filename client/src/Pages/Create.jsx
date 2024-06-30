@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Input,
   Button,
@@ -8,7 +8,7 @@ import {
   Divider,
   IconButton,
 } from "rsuite";
-import { Modal, ButtonToolbar, Placeholder } from "rsuite";
+import { Modal } from "rsuite";
 import {
   faTrashAlt,
   faEdit,
@@ -107,7 +107,7 @@ export default function Form() {
   async function handleSubmit() {
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_URL_HOST}/fowrm/create`,
+        `${process.env.REACT_APP_URL_HOST}/form/create`,
         data,
         {
           headers: {
@@ -119,7 +119,7 @@ export default function Form() {
       setOpen(true);
       setData({ name: "", description: "", questions: [] });
     } catch (err) {
-      console.log("Error: ", err);
+      alert("Error: " + err.response.data.message);
     }
   }
 
@@ -133,20 +133,17 @@ export default function Form() {
     setOption("");
   }
 
-  // useEffect(() => {
-  //   console.log(data);
-  //   console.log(options);
-  // }, [data, options]);
-
   return (
     <>
       <div className=" bg-white  w-full bg-grid-black/[0.1] relative flex items-center justify-center">
         <div className="absolute pointer-events-none inset-0 flex items-center justify-center bg-white  [mask-image:radial-gradient(ellipse_at_center,transparent_40%,black)]"></div>
         <div className="flex flex-col items-center justify-center m-10 p-10 w-screen">
-          <h1 className="font-Cursive text-8xl">FormsPro</h1>
-          <h1 className="font-Link text-2xl">Create your form here</h1>
-          <div className="m-5 p-5 flex space-y-10 flex-col bg-gray-200 w-[80%] rounded-3xl font-General">
-            <label className="w-[50%]">
+          <h1 className="font-Cursive text-4xl md:text-8xl">FormsPro</h1>
+          <h1 className="font-Link text-xl md:text-2xl">
+            Create your form here
+          </h1>
+          <div className="m-5 p-5 flex space-y-10 flex-col bg-gray-200 w-[100%] md:w-[80%] rounded-3xl font-General">
+            <label className="w-[100%] md:w-[50%]">
               <p>Enter Form name:</p>
               <Input
                 type="text"
@@ -155,7 +152,7 @@ export default function Form() {
                 onChange={(value) => handleChange("name", value)}
               />
             </label>
-            <label className="w-[50%]">
+            <label className="w-[100%] md:w-[50%]">
               <p>Enter Description:</p>
               <Input
                 type="text"
@@ -165,7 +162,7 @@ export default function Form() {
               />
             </label>
 
-            <div className="bg-white w-[50%] p-4 rounded-lg">
+            <div className="bg-white w-[100%] md:w-[50%] p-4 rounded-lg">
               {data.questions.length === 0 ? (
                 <div className="flex flex-col items-center justify-center space-y-2 m-3">
                   <FontAwesomeIcon icon={faSearch} />
@@ -249,6 +246,7 @@ export default function Form() {
                     <Radio key={queCounter} value={`Option${queCounter + 1}`}>
                       <Input
                         placeholder={`Option`}
+                        value={option}
                         onChange={(value) => {
                           handleOptionChange(value);
                         }}
@@ -271,8 +269,8 @@ export default function Form() {
               </label>
             </div>
 
-            <div className="flex flex-row items-center justify-between">
-              <div className="flex flex-col m-4">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="flex flex-col m-2 md:m-4">
                 <Checkbox>
                   By submitting this form, I agree to comply with all specified
                   terms and conditions.

@@ -8,6 +8,10 @@
   position: relative;
   color: #e3c454;
 }
+.bg-contactGradientV {
+  background: linear-gradient(to bottom, #000000, #434343);
+}
+
 .hover-underline-animation::after {
   content: "";
   position: absolute;

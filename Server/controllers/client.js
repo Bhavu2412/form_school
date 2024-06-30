@@ -13,7 +13,7 @@ const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
   cloud_name: `${process.env.CLOUD_NAME}`,
-  api_key: `${process.env.CLOUD_API_KEY}`,
+  api_key: process.env.CLOUD_API_KEY,
   api_secret: `${process.env.CLOUD_API_SECRET_KEY}`,
 });
 async function uploadToCloudinary(filePath, tags) {
@@ -21,6 +21,7 @@ async function uploadToCloudinary(filePath, tags) {
     const result = await cloudinary.uploader.upload(filePath, { tags });
     return { url: result.secure_url, error: null };
   } catch (error) {
+    console.log(error);
     return { url: null, error };
   }
 }
@@ -158,7 +159,7 @@ router.post("/fetch", isAuth, async (req, res, next) => {
     const form = await Form.findOne({ code: code });
     if (!userId) {
       return res.status(404).json({
-        message: `No user found please come after login`,
+        message: "No user found please come after login",
       });
     }
     if (!form) {

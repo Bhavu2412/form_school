@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Row, Col, Panel, ButtonGroup, Button } from "rsuite";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Panel } from "rsuite";
 import pv from "../images/charts/pv.svg";
 import uv from "../images/charts/uv.svg";
 import vv from "../images/charts/vv.svg";
@@ -7,7 +7,7 @@ import PieChart from "./PieChart";
 import DataTable from "./UserDataTable";
 import FDataTable from "./FormDataTable";
 import axios from "axios";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [data, setData] = useState({
@@ -16,11 +16,14 @@ const Dashboard = () => {
     users: [],
     clients: [],
   });
+  const navigate = useNavigate();
+
   useEffect(() => {
     async function fetchData() {
       try {
         let response;
-        if (localStorage.getItem("role") === "admin") {
+        const role = localStorage.getItem("role");
+        if (role === "admin") {
           response = await axios.post(
             `${process.env.REACT_APP_URL_HOST}/admin/analyse`,
             {},
@@ -30,8 +33,7 @@ const Dashboard = () => {
               },
             }
           );
-          setData(response.data);
-        } else if (localStorage.getItem("role") === "user") {
+        } else if (role === "user") {
           response = await axios.post(
             `${process.env.REACT_APP_URL_HOST}/user/analyse`,
             {},
@@ -41,7 +43,7 @@ const Dashboard = () => {
               },
             }
           );
-        } else if (localStorage.getItem("role") === "client") {
+        } else if (role === "client") {
           response = await axios.post(
             `${process.env.REACT_APP_URL_HOST}/client/analyse`,
             {},
@@ -51,81 +53,69 @@ const Dashboard = () => {
               },
             }
           );
+        } else {
+          alert("No user found");
+          return;
         }
         setData(response.data);
       } catch (err) {
-        // console.log("Error: ", err);
-        alert("Error: " + err.response.data.message);
+        navigate("/login");
       }
     }
     fetchData();
-  }, []);
+  }, [navigate]);
+
   return (
     <>
       <Row
         gutter={30}
-        className="dashboard-header mt-5 flex items-center justify-center"
+        className="dashboard-header mt-5 flex flex-wrap items-center justify-center"
       >
-        <Col xs={7}>
+        <Col xs={24} sm={8} className="mb-4 sm:mb-0">
           <Panel className="trend-box bg-blue-100">
-            <img className="chart-img" src={pv} />
+            <img className="chart-img" src={pv} alt="PV" />
             <div className="title">Users</div>
-            {localStorage.getItem("role") === "admin" && (
-              <div className="value">{data.users.length}</div>
-            )}
-            {localStorage.getItem("role") === "user" && (
-              <div className="value">1</div>
-            )}
-            {localStorage.getItem("role") === "client" && (
-              <div className="value">0</div>
-            )}
-            {localStorage.getItem("role") === null && (
-              <div className="value">0</div>
-            )}
+            <div className="value">
+              {localStorage.getItem("role") === "admin"
+                ? data.users.length
+                : localStorage.getItem("role") === "user"
+                ? 1
+                : localStorage.getItem("role") === "client"
+                ? 0
+                : 0}
+            </div>
           </Panel>
         </Col>
-
-        <Col xs={7}>
+        <Col xs={24} sm={8} className="mb-4 sm:mb-0">
           <Panel className="trend-box bg-green-100">
-            <img className="chart-img" src={vv} />
+            <img className="chart-img" src={vv} alt="VV" />
             <div className="title">Client</div>
-            {localStorage.getItem("role") === "admin" && (
-              <div className="value">{data.uniqueClientsCount}</div>
-            )}
-            {localStorage.getItem("role") === "user" && (
-              <div className="value">{data.uniqueClientsCount}</div>
-            )}
-            {localStorage.getItem("role") === "client" && (
-              <div className="value">1</div>
-            )}
-            {localStorage.getItem("role") === null && (
-              <div className="value">0</div>
-            )}
+            <div className="value">
+              {localStorage.getItem("role") === "admin" ||
+              localStorage.getItem("role") === "user"
+                ? data.uniqueClientsCount
+                : localStorage.getItem("role") === "client"
+                ? 1
+                : 0}
+            </div>
           </Panel>
         </Col>
-        <Col xs={7}>
+        <Col xs={24} sm={8}>
           <Panel className="trend-box bg-red-100">
-            <img className="chart-img" src={uv} />
+            <img className="chart-img" src={uv} alt="uv" />
             <div className="title">Forms</div>
             <div className="value">{data.forms.length}</div>
           </Panel>
         </Col>
       </Row>
 
-      <Row gutter={30}>
-        <Col xs={16}>
+      <Row gutter={30} className="mt-4">
+        <Col xs={24} md={16}>
           <FDataTable data={data} />
         </Col>
-        <Col xs={8}>
-          {localStorage.getItem("role") === "user" && (
-            <PieChart
-              title="Form v/s Client"
-              data={[data.forms.length, data.uniqueClientsCount]}
-              type="donut"
-              labels={["Form", "Client"]}
-            />
-          )}
-          {localStorage.getItem("role") === "admin" && (
+        <Col xs={24} md={8} className="mt-4 md:mt-0">
+          {(localStorage.getItem("role") === "user" ||
+            localStorage.getItem("role") === "admin") && (
             <PieChart
               title="Form v/s Client"
               data={[data.forms.length, data.uniqueClientsCount]}
@@ -135,13 +125,14 @@ const Dashboard = () => {
           )}
         </Col>
       </Row>
-      <Row gutter={30}>
-        <Col xs={16}>
+
+      <Row gutter={30} className="mt-4">
+        <Col xs={24} md={16}>
           {localStorage.getItem("role") === "admin" && (
             <DataTable data={data} />
           )}
         </Col>
-        <Col xs={8}>
+        <Col xs={24} md={8} className="mt-4 md:mt-0">
           {localStorage.getItem("role") === "admin" && (
             <PieChart
               title="User v/s Client"

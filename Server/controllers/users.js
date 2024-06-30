@@ -9,9 +9,10 @@ const multer = require("multer");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
 const isAuth = require("../utils/isAuth");
+require("dotenv").config();
 cloudinary.config({
   cloud_name: `${process.env.CLOUD_NAME}`,
-  api_key: `${process.env.CLOUD_API_KEY}`,
+  api_key: process.env.CLOUD_API_KEY,
   api_secret: `${process.env.CLOUD_API_SECRET_KEY}`,
 });
 async function uploadToCloudinary(filePath, tags) {
@@ -106,7 +107,7 @@ router.post("/login", async (req, res, next) => {
         message: "No user found!",
       });
     }
-    const match = bcrypt.compare(user.password, password);
+    const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.status(400).json({ message: "Password donot match!" });
     }

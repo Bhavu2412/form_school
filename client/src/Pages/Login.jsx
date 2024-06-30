@@ -61,12 +61,12 @@ export default function Login() {
   }
   return (
     <>
-      <div className="h-[100vh] w-screen flex items-center justify-center ">
-        <div className="bg-contactGradient h-[90%] w-[90%] space-y-2 rounded-3xl p-10 text-blue-100 flex flex-row justify-start items-center">
-          <div className="text-blue-100 flex flex-col justify-center items-start w-[60%]">
-            <div className="space-y-4">
+      <div className="h-[180%] md:h-[100vh] w-screen flex items-center justify-center ">
+        <div className="bg-contactGradient my-10 h-[90%] md:h-[90%] w-[90%] space-x-2 md:space-y-2 rounded-3xl p-10 text-blue-100 flex flex-col md:flex-row justify-start items-center">
+          <div className="text-blue-100 flex-col justify-center items-center md:items-start w-[60%]">
+            <div className="flex flex-col items-center md:items-start space-y-4">
               <FontAwesomeIcon
-                className="h-32"
+                className="h-12 md:h-32"
                 icon={faSlack}
                 style={{ color: "#63E6BE" }}
               />
@@ -84,7 +84,7 @@ export default function Login() {
                 </div>
               </div>
             </div>
-            <div className="mt-4 flex flex-col space-y-4 w-[60%] font-General">
+            <div className="mt-4 flex flex-col space-y-4 w-[100%] items-center justify-center md:items-start md:w-[60%] font-General">
               <label>
                 <p>You are :</p>
                 <RadioGroup
@@ -131,7 +131,7 @@ export default function Login() {
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center m-5">
             <Lottie
               animationData={ani}
               loop={true}
